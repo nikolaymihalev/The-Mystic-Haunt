@@ -17,7 +17,9 @@ public class RoomNodeSO : ScriptableObject
 
 #if UNITY_EDITOR
     [HideInInspector] public Rect rect;
-
+    [HideInInspector] public bool isLeftClickDragging = false;
+    [HideInInspector] public bool isSlected = false;
+    
     public void Initialise(Rect rect,RoomNodeGraphSO nodeGraph, RoomNodeTypeSO roomNodeType)
     {
         this.rect = rect;
@@ -56,6 +58,70 @@ public class RoomNodeSO : ScriptableObject
                 roomArray[i] = roomNodeTypeList.list[i].roomNodeTypeName;
         }
         return roomArray;
+    }
+
+    public void ProcessEvents(Event currentEvent)
+    {
+        switch (currentEvent.type)
+        {
+            case EventType.MouseDown: ProcessMouseDownEvent(currentEvent);
+                break;
+            case EventType.MouseUp: ProcessMouseUpEvent(currentEvent);
+                break;
+            case EventType.MouseDrag: ProcessMouseDragEvent(currentEvent);
+                break;
+        }
+    }
+
+    void ProcessMouseDownEvent(Event currentEvent)
+    {
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftClickDownEvent();
+        }
+    }
+    
+    void ProcessMouseUpEvent(Event currentEvent)
+    {
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftClickUpEvent();
+        }
+    }
+    
+    void ProcessMouseDragEvent(Event currentEvent)
+    {
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftMouseDragEvent(currentEvent);
+        }
+    }
+    
+    
+
+    void ProcessLeftClickDownEvent()
+    {
+        Selection.activeObject = this;
+        isSlected = !isSlected;
+    }
+    void ProcessLeftClickUpEvent()
+    {
+        if (isLeftClickDragging)
+        {
+            isLeftClickDragging = false;
+        }
+    }
+    void ProcessLeftMouseDragEvent(Event currentEvent)
+    {
+        isLeftClickDragging = true;
+        DragNode(currentEvent.delta);
+        GUI.changed = true;
+    }
+
+    void DragNode(Vector2 delta)
+    {
+        rect.position += delta;
+        EditorUtility.SetDirty(this);
     }
 #endif
 
