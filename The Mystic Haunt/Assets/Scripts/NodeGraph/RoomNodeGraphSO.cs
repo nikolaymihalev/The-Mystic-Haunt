@@ -15,6 +15,15 @@ public class RoomNodeGraphSO : ScriptableObject
         LoadRoomNodeDictionary();
     }
 
+    public RoomNodeSO GetRoomNode(string roomNodeID)
+    {
+        if (roomNodeDictionary.TryGetValue(roomNodeID, out RoomNodeSO roomNode))
+        {
+            return roomNode;
+        }
+        return null;
+    }
+
     void LoadRoomNodeDictionary()
     {
         roomNodeDictionary.Clear();

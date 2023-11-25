@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 
@@ -82,9 +83,61 @@ public class RoomNodeSO : ScriptableObject
 
     public bool AddChildRoomNodeIDTToRoomNode(string childID)
     {
-        childRoomNodeIDList.Add(childID);
+        if (IsChildRoomValid(childID))
+        {
+            childRoomNodeIDList.Add(childID);
+            return true;
+        }
+        return false;
+    }
+
+    bool IsChildRoomValid(string childId)
+    {
+        bool isConnectedBossNodeAlready = false;
+        foreach (RoomNodeSO roomNode in roomNodeGraph.roomNodeList)
+        {
+            if (roomNode.roomNodeType.isBossRoom && roomNode.parentRoomNodeIDList.Count > 0)
+            {
+                isConnectedBossNodeAlready = true;
+            }
+        }
+        
+        if(roomNodeGraph.GetRoomNode(childId).roomNodeType.isBossRoom&&isConnectedBossNodeAlready)
+            return false;
+        
+        if(roomNodeGraph.GetRoomNode(childId).roomNodeType.isNone)
+            return false;
+        
+        if(childRoomNodeIDList.Contains(childId))
+            return false;
+
+        if (id == childId)
+            return false;
+
+        if (parentRoomNodeIDList.Contains(childId))
+            return false;
+        
+        if(roomNodeGraph.GetRoomNode(childId).parentRoomNodeIDList.Count>0)
+            return false;
+        
+        if(roomNodeGraph.GetRoomNode(childId).roomNodeType.isCorridor&&roomNodeType.isCorridor)
+            return false;
+        
+        if(!roomNodeGraph.GetRoomNode(childId).roomNodeType.isCorridor&&!roomNodeType.isCorridor)
+            return false;
+        
+        if(roomNodeGraph.GetRoomNode(childId).roomNodeType.isCorridor&& childRoomNodeIDList.Count>=Settings.maxChildCorridors)
+            return false;
+        
+        if(roomNodeGraph.GetRoomNode(childId).roomNodeType.isEntrance)
+            return false;
+        
+        if(!roomNodeGraph.GetRoomNode(childId).roomNodeType.isCorridor&&childRoomNodeIDList.Count>0)
+            return false;
+
         return true;
     }
+
     public bool AddParentRoomNodeIDTToRoomNode(string parentID)
     {
         parentRoomNodeIDList.Add(parentID);
