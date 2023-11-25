@@ -50,7 +50,7 @@ public class RoomNodeGraphEditor : EditorWindow
         {
             ProcessEvents(Event.current);
 
-           // DrawRoomNodes();
+            DrawRoomNodes();
         }
 
         if (GUI.changed)
@@ -93,7 +93,38 @@ public class RoomNodeGraphEditor : EditorWindow
     void ShowContextMenu(Vector2 mousePosition)
     {
         GenericMenu menu = new GenericMenu();
-        //menu.AddItem(new GUIContent("Create Room Node"),false,CreateRoomNode,mousePosition);
+        menu.AddItem(new GUIContent("Create Room Node"),false,CreateRoomNode,mousePosition);
         menu.ShowAsContext();
+    }
+
+    void CreateRoomNode(object mousePositionObject)
+    {
+        CreateRoomNode(mousePositionObject,roomNodeTypeList.list.Find(x=>x.isNone));
+    }
+
+    void CreateRoomNode(object mousePositionObject, RoomNodeTypeSO roomNodeType)
+    {
+        Vector2 mousePosition = (Vector2)mousePositionObject;
+
+        RoomNodeSO roomNode = ScriptableObject.CreateInstance<RoomNodeSO>();
+        
+        currentRoomNodeGraph.roomNodeList.Add(roomNode);
+
+        roomNode.Initialise(new Rect(mousePosition, new Vector2(nodeWidth, nodeHeight)), currentRoomNodeGraph,
+            roomNodeType);
+        
+        AssetDatabase.AddObjectToAsset(roomNode,currentRoomNodeGraph);
+        
+        AssetDatabase.SaveAssets();
+    }
+
+    void DrawRoomNodes()
+    {
+        foreach (RoomNodeSO roomNode in currentRoomNodeGraph.roomNodeList)
+        {
+            roomNode.Draw(roomNodeStyle);
+        }
+
+        GUI.changed = true;
     }
 }
