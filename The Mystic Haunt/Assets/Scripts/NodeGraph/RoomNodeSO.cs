@@ -73,11 +73,26 @@ public class RoomNodeSO : ScriptableObject
         }
     }
 
+    public bool AddChildRoomNodeIDTToRoomNode(string childID)
+    {
+        childRoomNodeIDList.Add(childID);
+        return true;
+    }
+    public bool AddParentRoomNodeIDTToRoomNode(string parentID)
+    {
+        parentRoomNodeIDList.Add(parentID);
+        return true;
+    }
+
     void ProcessMouseDownEvent(Event currentEvent)
     {
         if (currentEvent.button == 0)
         {
             ProcessLeftClickDownEvent();
+        }
+        else if (currentEvent.button == 1)
+        {
+            ProcessRightClickDownEvent(currentEvent);
         }
     }
     
@@ -122,6 +137,10 @@ public class RoomNodeSO : ScriptableObject
     {
         rect.position += delta;
         EditorUtility.SetDirty(this);
+    }
+    void ProcessRightClickDownEvent(Event currentEvent)
+    {
+        roomNodeGraph.SetNodeToDrawConnectionLineFrom(this,currentEvent.mousePosition);
     }
 #endif
 
